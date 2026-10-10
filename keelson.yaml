@@ -1,0 +1,269 @@
+slug: shared-equipment
+description: '検証用スマホ・共用 PC・プロジェクター・撮影機材など、みんなで使う機材の予約と貸出・返却の台帳。7 日の空き状況と QR 付きの資産タグで、いま空いているかがすぐ分かります。'
+runtime: node-slim
+# SvelteKit (adapter-node) server built by `npm run build` at deploy time.
+command: 'node build/index.js'
+
+# Managed libSQL. The platform injects KEELSON_DB_URL / KEELSON_DB_AUTH_TOKEN
+# into the web service and the cron job alike. `migrate` runs once per deploy,
+# in the new image, before traffic moves to the new revision; a failure fails
+# the deploy and the old revision keeps serving.
+db:
+  mode: libsql
+  migrate: 'node scripts/migrate.mjs'
+
+env:
+  # Attachments are up to 10 MiB each; the Node adapter's default request body
+  # limit is 512K.
+  BODY_SIZE_LIMIT: '11M'
+
+# Optional. Without them the app works fully and the reminder job only logs
+# how many reminders were due. NOTIFY_WEBHOOK_URL receives
+# POST {"to", "subject", "text"} (JSON) and relays it as mail (README).
+secrets:
+  items:
+    - name: NOTIFY_WEBHOOK_URL
+      description: 'Webhook that relays return reminders as mail (optional)'
+    - name: NOTIFY_WEBHOOK_TOKEN
+      description: 'Bearer token sent to the webhook (optional)'
+
+# Return reminders, every morning in the workspace time zone. Node runs the
+# TypeScript file directly (no build step). `timeout` is omitted so the plan's
+# ceiling applies; one run takes seconds.
+crons:
+  - name: return-reminder
+    schedule: '0 9 * * *'
+    command: 'node src/lib/server/jobs/return-reminder.ts'
+
+# The employee list comes from the workspace directory: run
+# `keelson apps directory enable` and redeploy (README).
+
+# AI assistants (MCP). The platform MCP gateway lists these tools to an
+# assistant the user has connected (OAuth consent per app) and turns each call
+# into POST /api/mcp/<name> with the arguments as the JSON body
+# (src/lib/server/mcp/registry.ts). Keep this list and MCP_TOOLS in step
+# (tests/mcp.test.ts checks it). Tools with permission manage are for admins.
+# Human-language values stay one-line quoted strings (no block scalars, no
+# quote characters inside) so they can be extracted for translation.
+mcp:
+  enabled: true
+  instructions: '共有機材管理アプリです。検証用スマホ・共用 PC・プロジェクター・撮影機材などの予約・貸出・返却を記録します。機材は管理番号(asset_tag。例: SP-0001)で指定し、分からなければ find_equipment で探します。人は名前かメールアドレス(person)で指定し、省くと自分です。候補が複数なら fields.person: ambiguous と candidates が返るので、利用者に確かめてメールアドレスで指定し直します。日時はアプリのタイムゾーンの YYYY-MM-DDTHH:MM で 15 分刻みです。貸出はいまから始まり、返却予定を省くと今日の 18:00 です。先の日時から使う話は予約(reserve_equipment)にします。予約の開始を省くと次の 15 分枠、終了を省くと開始の 1 時間後です。機材の登録・利用停止・再開と、ほかの人の分の貸出・予約は管理者だけができます(forbidden_manage_required)。他人の予約・貸出は reservation_not_owned / loan_not_owned で拒否されます。入力の誤りは validation_failed で、fields に「引数名: 理由」が入ります(required / not_found / step = 15 分刻みでない / past / overlap = 予約が重なる / conflict = 返却予定が次の予約に掛かる / taken = 登録済み など)。直せるなら直して呼び直し、分からなければ利用者に聞いてください。一覧は最大 50 件で、total と truncated で全体の件数が分かります。書き込みの結果が分からないときは、呼び直す前に get_equipment や my_loans で確かめてください。'
+  tools:
+    - name: find_equipment
+      description: '機材を探す。キーワード・状態・種類・保管場所・空いている期間で絞り込み、要点(管理番号・名称・状態・いまの利用者と返却予定・次の予約)を返す。機材を指定する前に管理番号を調べるときにも使う。例:「今使っていない Windows PC ある?」→ q=Windows, status=[available]。「明日 13 時から 15 時に空いているカメラは?」→ type=カメラ と available_from / available_to。'
+      input:
+        type: object
+        properties:
+          q:
+            type: string
+            description: 'キーワード。管理番号・名称・種類に部分一致(管理者は製造番号・備考・利用者名も)'
+          status:
+            type: array
+            items:
+              type: string
+              enum: [available, on_loan, reserved, overdue, suspended]
+            description: '状態(複数ならどれかに当たるもの)。available = いま空いている / on_loan = 貸出中 / reserved = 今後の予約がある / overdue = 返却予定を過ぎて未返却 / suspended = 利用停止中'
+          type:
+            type: string
+            description: '種類の名前(例: ノートPC、カメラ)。名前は list_masters で確かめられる'
+          location:
+            type: string
+            description: '保管場所の名前'
+          available_from:
+            type: string
+            description: 'この時刻から available_to まで予約を入れられる機材だけにする。YYYY-MM-DDTHH:MM、または YYYY-MM-DD(その日の始まり)。available_to と組で指定'
+          available_to:
+            type: string
+            description: '期間の終わり(この時刻は含まない)。YYYY-MM-DDTHH:MM、または YYYY-MM-DD(その日いっぱい)'
+          limit:
+            type: integer
+            minimum: 1
+            maximum: 50
+            description: '返す件数(既定 20、最大 50)'
+        required: []
+      access: read
+    - name: get_equipment
+      description: '機材 1 台の詳細。状態、いま借りている人と返却予定、今後の予約(最大 5 件。予約した人と期間)を返す。管理者には製造番号・備考(先頭 200 字)・利用停止の詳細も返す。1 台について聞かれたときに使う。例:「CM-0001 はいつ空く?」「PJ-0002 は誰が持ってる?」'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号(例: SP-0001)。分からなければ find_equipment で探す'
+        required: [asset_tag]
+      access: read
+    - name: my_loans
+      description: '自分がいま借りている機材と返却予定。返却予定を過ぎたものは overdue: true。「借りている三脚を返した」のように管理番号が分からない返却・延長は、まずこれで管理番号を調べる。例:「私が借りているものは?」「返却はいつまで?」'
+      input:
+        type: object
+        properties:
+          limit:
+            type: integer
+            minimum: 1
+            maximum: 50
+            description: '返す件数(既定 20、最大 50)'
+        required: []
+      access: read
+    - name: my_reservations
+      description: '自分の今後の予約(いま使える時間のものを含む)。受け取れるか(can_pick_up)と、受け取れない理由(blocked: suspended = 利用停止中 / not_returned = 前の利用者が未返却 / on_loan = ほかの人が貸出中)を返す。例:「私の予約を見せて」「明日の予約は?」'
+      input:
+        type: object
+        properties:
+          limit:
+            type: integer
+            minimum: 1
+            maximum: 50
+            description: '返す件数(既定 20、最大 50)'
+        required: []
+      access: read
+    - name: list_masters
+      description: '機材の種類と保管場所の名前の一覧(active: false は使わなくなった値)。register_equipment の type / location や、find_equipment の絞り込みに使う名前を確かめるときに使う。'
+      input:
+        type: object
+        properties: {}
+        required: []
+      access: read
+    - name: register_equipment
+      description: '機材を 1 台登録する(管理者だけ)。管理番号は一意で、すでにあれば fields.asset_tag が taken になる(同じ登録を 2 回しても 2 台にはならない)。種類・保管場所は list_masters にある有効な名前で指定する。例:「SP-0010 で検証用 Pixel 10 を登録して。種類はスマートフォン、保管場所は機材庫」'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号(社内番号。40 字まで)'
+          name:
+            type: string
+            description: '名称(120 字まで)'
+          type:
+            type: string
+            description: '種類の名前(list_masters の有効な値)'
+          serial_no:
+            type: string
+            description: '製造番号(80 字まで)'
+          location:
+            type: string
+            description: '保管場所の名前(list_masters の有効な値)'
+          note:
+            type: string
+            description: '備考(管理者だけに見える。2000 字まで)'
+        required: [asset_tag, name]
+      access: write
+      permission: manage
+    - name: lend_equipment
+      description: '機材をいまから貸し出す(貸出日時は操作した時刻)。person を省くと自分が借りる。管理者は person で借りる人を指定できる。借りる人の予約が 30 分後までに始まるなら、その予約を使ったことになる。先の日時から使う話なら、これではなく reserve_equipment を使う。いま貸せない理由は error で返る: equipment_on_loan = 貸出中 / previous_loan_not_returned = 前の人が返却予定を過ぎても未返却 / equipment_reserved = いまほかの人の予約の時間 / equipment_suspended = 利用停止中 / fields.due_at: conflict = 返却予定が次の人の予約に掛かる。例:「鈴木さんが今日からデバッグ用の Pixel を借ります。返却は金曜」→ find_equipment で管理番号を調べ、person=鈴木, due_at=金曜の日付。'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号'
+          due_at:
+            type: string
+            description: '返却予定。YYYY-MM-DDTHH:MM(15 分刻み、いまより後)、または YYYY-MM-DD(その日の 18:00)。省くと今日の 18:00(過ぎていれば明日の 18:00)'
+          note:
+            type: string
+            description: '備考(用途など。500 字まで)'
+          person:
+            type: string
+            description: '借りる人の名前かメールアドレス(管理者だけ。敬称は付けない)。省くと自分'
+        required: [asset_tag]
+      access: write
+    - name: return_equipment
+      description: '貸出中の機材の返却を記録する(返却日時は操作した時刻)。本人は自分の分だけ、管理者は誰の分でも記録できる(回収)。管理者は保管場所の更新と、要修理として利用停止にすることもできる。例:「借りている三脚を返した」→ my_loans で管理番号を調べてから呼ぶ。「PJ-0001 を回収。レンズに傷があるので要修理」→ needs_repair=true。'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号'
+          note:
+            type: string
+            description: '返却の備考(500 字まで)。needs_repair のときは利用停止の詳細にもなる'
+          location:
+            type: string
+            description: '返却後の保管場所の名前(管理者だけ)'
+          needs_repair:
+            type: boolean
+            description: 'true なら返却と同時に利用停止(理由: 修理中)にする(管理者だけ)'
+        required: [asset_tag]
+      access: write
+    - name: extend_loan
+      description: '貸出中の機材の返却予定を変える(延長・前倒し)。借りている本人と管理者ができる。新しい返却予定がほかの人の予約に掛かると fields.due_at: conflict。例:「借りている iPad を明日まで延長して」'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号'
+          due_at:
+            type: string
+            description: '新しい返却予定。YYYY-MM-DDTHH:MM(15 分刻み、いまより後)、または YYYY-MM-DD(その日の 18:00)'
+        required: [asset_tag, due_at]
+      access: write
+    - name: reserve_equipment
+      description: '機材を予約する。期間は開始から終了まで(終了の時刻は含まない)。ほかの予約や期限内の貸出と重なると fields.starts_at: overlap。15 分刻みで、1 回 30 日まで。管理者は person で予約する人を指定できる。「明日から借りたい」のように先の日時から使う話は貸出ではなくこちら。例:「CM-0001 を明日 13 時から 15 時まで予約して」→ starts_at=<明日の日付>T13:00, ends_at=<明日の日付>T15:00。'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号'
+          starts_at:
+            type: string
+            description: '開始。YYYY-MM-DDTHH:MM(15 分刻み。いまの 15 分枠より前は不可)。省くと次の 15 分枠'
+          ends_at:
+            type: string
+            description: '終了(この時刻は含まない)。YYYY-MM-DDTHH:MM(15 分刻み)。省くと開始の 1 時間後'
+          purpose:
+            type: string
+            description: '目的(予約した本人と管理者だけに見える。500 字まで)'
+          person:
+            type: string
+            description: '予約する人の名前かメールアドレス(管理者だけ。敬称は付けない)。省くと自分'
+        required: [asset_tag]
+      access: write
+    - name: cancel_reservation
+      description: '予約を取り消す。予約した本人と管理者ができる。reservation_id(my_reservations や get_equipment の結果にある)か、asset_tag と starts_at で指定する。asset_tag だけなら、その機材の自分の今後の予約が 1 件のときにそれを取り消す(複数あると fields.starts_at: required)。例:「明日の CM-0001 の予約をキャンセルして」'
+      input:
+        type: object
+        properties:
+          reservation_id:
+            type: string
+            description: '予約の ID'
+          asset_tag:
+            type: string
+            description: '管理番号(reservation_id が無いとき)'
+          starts_at:
+            type: string
+            description: '取り消す予約の開始。YYYY-MM-DDTHH:MM'
+        required: []
+      access: write
+    - name: suspend_equipment
+      description: '機材を利用停止にする(管理者だけ)。停止中は新しい予約と貸出ができない(入っている予約は残り、貸出中なら返却は記録できる)。すでに停止中なら equipment_suspended。例:「PJ-0002 は故障で利用停止にして」→ reason=broken。'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号'
+          reason:
+            type: string
+            enum: [repair, broken, lost, other]
+            description: '理由。repair = 修理中 / broken = 故障 / lost = 紛失 / other = その他'
+          detail:
+            type: string
+            description: '詳細(管理者だけに見える。500 字まで)'
+        required: [asset_tag, reason]
+      access: write
+      permission: manage
+    - name: resume_equipment
+      description: '利用停止中の機材の利用を再開する(管理者だけ)。停止中でなければ equipment_not_suspended。例:「PJ-0002 の修理が終わったので使えるようにして」'
+      input:
+        type: object
+        properties:
+          asset_tag:
+            type: string
+            description: '管理番号'
+        required: [asset_tag]
+      access: write
+      permission: manage

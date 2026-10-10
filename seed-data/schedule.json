@@ -1,0 +1,201 @@
+{
+	"former": [
+		{ "id": "sample-kobayashi", "name": "(サンプル)小林", "email": "kobayashi.sample@example.com" }
+	],
+	"loans": [
+		{
+			"tag": "PC-0001",
+			"user": "sample-sato",
+			"lent": [-1, "09:30"],
+			"due": [2, "18:00"],
+			"booking": { "start": [-1, "09:30"], "purpose": "大阪の顧客訪問(3 日間)" }
+		},
+		{
+			"tag": "SP-0003",
+			"user": "sample-takahashi",
+			"lent": [-1, "14:00"],
+			"due": [0, "18:00"],
+			"note": "Android 15 の表示崩れの再現確認。"
+		},
+		{
+			"tag": "CM-0001",
+			"user": "sample-ito",
+			"lent": [-4, "10:00"],
+			"due": [-1, "18:00"],
+			"note": "展示会の撮影。"
+		},
+		{
+			"tag": "NW-0001",
+			"user": "sample-suzuki",
+			"lent": [-2, "09:00"],
+			"due": [5, "18:00"]
+		},
+		{
+			"tag": "TB-0001",
+			"user": "sample-nakamura",
+			"lent": [-1, "16:00"],
+			"due": [0, "12:00"]
+		},
+		{
+			"tag": "SP-0001",
+			"user": "sample-sato",
+			"lent": [-10, "10:00"],
+			"due": [-8, "18:00"],
+			"returned": [-8, "17:20"],
+			"returnKind": "returned"
+		},
+		{
+			"tag": "PJ-0001",
+			"user": "sample-tanaka",
+			"lent": [-6, "13:00"],
+			"due": [-6, "17:00"],
+			"returned": [-6, "16:45"],
+			"returnKind": "returned",
+			"booking": { "start": [-6, "13:00"], "purpose": "新製品の社内説明会" }
+		},
+		{
+			"tag": "CM-0002",
+			"user": "sample-watanabe",
+			"lent": [-5, "09:00"],
+			"due": [-3, "18:00"],
+			"returned": [-2, "10:15"],
+			"returnKind": "collected",
+			"returnNote": "返却予定を過ぎていたため総務で回収。"
+		},
+		{
+			"tag": "PC-0002",
+			"user": "sample-yamamoto",
+			"lent": [-14, "09:00"],
+			"due": [-7, "18:00"],
+			"returned": [-7, "17:00"],
+			"returnKind": "returned"
+		},
+		{
+			"tag": "SP-0005",
+			"user": "sample-kobayashi",
+			"lent": [-30, "10:00"],
+			"due": [-28, "18:00"],
+			"returned": [-27, "15:00"],
+			"returnKind": "collected",
+			"returnNote": "画面割れあり。"
+		},
+		{
+			"tag": "AU-0001",
+			"user": "sample-tanaka",
+			"lent": [-3, "10:00"],
+			"due": [-3, "19:00"],
+			"returned": [-3, "18:30"],
+			"returnKind": "returned"
+		},
+		{
+			"tag": "ST-0001",
+			"user": "sample-ito",
+			"lent": [-4, "10:00"],
+			"due": [-2, "18:00"],
+			"returned": [-2, "17:45"],
+			"returnKind": "returned"
+		}
+	],
+	"reservations": [
+		{
+			"tag": "PJ-0001",
+			"user": "sample-suzuki",
+			"start": [0, "15:00"],
+			"end": [0, "17:00"],
+			"purpose": "取引先向けの製品デモ"
+		},
+		{
+			"tag": "AU-0002",
+			"user": "sample-sato",
+			"start": [0, "16:00"],
+			"end": [0, "18:00"],
+			"purpose": "部内の定例(オンライン併用)"
+		},
+		{
+			"tag": "PJ-0002",
+			"user": "sample-tanaka",
+			"start": [1, "10:00"],
+			"end": [1, "12:00"],
+			"purpose": "全社会議"
+		},
+		{
+			"tag": "CM-0001",
+			"user": "sample-watanabe",
+			"start": [1, "13:00"],
+			"end": [1, "17:00"],
+			"purpose": "製品写真の撮影"
+		},
+		{
+			"tag": "SP-0001",
+			"user": "sample-sato",
+			"start": [1, "09:00"],
+			"end": [3, "18:00"],
+			"purpose": "リリース前の実機検証"
+		},
+		{
+			"tag": "PC-0001",
+			"user": "sample-takahashi",
+			"start": [3, "09:00"],
+			"end": [4, "18:00"],
+			"purpose": "新人研修"
+		},
+		{
+			"tag": "ST-0003",
+			"user": "sample-yamaguchi",
+			"start": [2, "09:00"],
+			"end": [2, "18:00"],
+			"purpose": "採用動画の撮影"
+		},
+		{
+			"tag": "ST-0002",
+			"user": "sample-yamaguchi",
+			"start": [2, "09:00"],
+			"end": [2, "18:00"],
+			"purpose": "採用動画の撮影"
+		},
+		{
+			"tag": "TB-0002",
+			"user": "sample-ito",
+			"start": [4, "13:00"],
+			"end": [4, "15:00"],
+			"purpose": "デザインレビュー"
+		},
+		{
+			"tag": "SP-0005",
+			"user": "sample-yamamoto",
+			"start": [2, "10:00"],
+			"end": [2, "12:00"],
+			"purpose": "Android 14 の動作確認"
+		},
+		{
+			"tag": "PC-0003",
+			"user": "sample-nakamura",
+			"start": [4, "09:00"],
+			"end": [4, "18:00"],
+			"purpose": "客先での作業"
+		},
+		{
+			"tag": "AU-0001",
+			"user": "sample-watanabe",
+			"start": [-2, "10:00"],
+			"end": [-2, "12:00"],
+			"purpose": "インタビュー収録"
+		},
+		{
+			"tag": "CM-0003",
+			"user": "sample-takahashi",
+			"start": [2, "10:00"],
+			"end": [2, "12:00"],
+			"purpose": "イベントの記録",
+			"cancelled": "user"
+		},
+		{
+			"tag": "PJ-0002",
+			"user": "sample-ito",
+			"start": [-1, "14:00"],
+			"end": [-1, "16:00"],
+			"purpose": "勉強会",
+			"cancelled": "admin"
+		}
+	]
+}

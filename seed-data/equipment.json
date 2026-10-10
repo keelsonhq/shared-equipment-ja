@@ -1,0 +1,215 @@
+{
+	"admin": { "id": "sample-yamaguchi", "name": "(サンプル)山口" },
+	"equipment": [
+		{
+			"tag": "SP-0001",
+			"name": "検証用 iPhone 16(iOS 18)",
+			"type": "スマートフォン",
+			"serial": "F4GZK21LPQ",
+			"location": "機材庫",
+			"note": "充電ケーブル・ケース付き。検証用 Apple ID でサインイン済み。",
+			"createdDaysAgo": 240
+		},
+		{
+			"tag": "SP-0002",
+			"name": "検証用 iPhone SE 第3世代(iOS 17)",
+			"type": "スマートフォン",
+			"serial": "F17XK8PQN2",
+			"location": "機材庫",
+			"note": "古い OS の確認用。OS を更新しないこと。",
+			"createdDaysAgo": 400
+		},
+		{
+			"tag": "SP-0003",
+			"name": "検証用 Pixel 9(Android 15)",
+			"type": "スマートフォン",
+			"serial": "3A281FDH200P5K",
+			"location": "機材庫",
+			"createdDaysAgo": 180
+		},
+		{
+			"tag": "SP-0004",
+			"name": "検証用 Galaxy A55(Android 14)",
+			"type": "スマートフォン",
+			"serial": "R5CX20AB91M",
+			"location": "機材庫",
+			"createdDaysAgo": 180
+		},
+		{
+			"tag": "SP-0005",
+			"name": "検証用 AQUOS wish4(Android 14)",
+			"type": "スマートフォン",
+			"serial": "SH-M27-0042",
+			"location": "総務カウンター",
+			"createdDaysAgo": 300,
+			"suspend": { "reason": "broken", "note": "画面割れ。修理の見積もり待ち。", "daysAgo": 27 }
+		},
+		{
+			"tag": "TB-0001",
+			"name": "iPad 第10世代 64GB",
+			"type": "タブレット",
+			"serial": "DMPX92KLQ1",
+			"location": "機材庫",
+			"createdDaysAgo": 500
+		},
+		{
+			"tag": "TB-0002",
+			"name": "iPad Pro 11インチ(M4)",
+			"type": "タブレット",
+			"serial": "HX2Q8LMN40",
+			"location": "機材庫",
+			"note": "Apple Pencil 付き。デザインレビュー用。",
+			"createdDaysAgo": 120
+		},
+		{
+			"tag": "TB-0003",
+			"name": "Galaxy Tab S9 FE",
+			"type": "タブレット",
+			"serial": "R52W30CK7TZ",
+			"location": "機材庫",
+			"createdDaysAgo": 200
+		},
+		{
+			"tag": "PC-0001",
+			"name": "共用ノート PC ThinkPad X1 Carbon(Windows 11)",
+			"type": "ノートPC",
+			"serial": "PF4K2Q7M",
+			"location": "総務カウンター",
+			"note": "出張・研修用。ログインは共用アカウント。",
+			"createdDaysAgo": 600
+		},
+		{
+			"tag": "PC-0002",
+			"name": "共用ノート PC MacBook Air M3",
+			"type": "ノートPC",
+			"serial": "C02XK4M1Q6L4",
+			"location": "総務カウンター",
+			"createdDaysAgo": 300
+		},
+		{
+			"tag": "PC-0003",
+			"name": "共用ノート PC Let's note SV(Windows 11)",
+			"type": "ノートPC",
+			"serial": "3KCSA10215",
+			"location": "総務カウンター",
+			"createdDaysAgo": 900,
+			"suspend": {
+				"reason": "repair",
+				"note": "キーボード交換のためメーカー修理中。",
+				"daysAgo": 6
+			}
+		},
+		{
+			"tag": "PC-0004",
+			"name": "検証用 Chromebook",
+			"type": "ノートPC",
+			"serial": "NXK1QSJ0042",
+			"location": "機材庫",
+			"createdDaysAgo": 260
+		},
+		{
+			"tag": "PJ-0001",
+			"name": "モバイルプロジェクター EF-21",
+			"type": "プロジェクター",
+			"serial": "X8GH210044",
+			"location": "会議室ロッカー",
+			"note": "HDMI ケーブル 3m 付き。",
+			"createdDaysAgo": 700
+		},
+		{
+			"tag": "PJ-0002",
+			"name": "ビジネスプロジェクター EB-L210W",
+			"type": "プロジェクター",
+			"serial": "X9KF330117",
+			"location": "会議室ロッカー",
+			"createdDaysAgo": 450
+		},
+		{
+			"tag": "PJ-0003",
+			"name": "ポータブルスクリーン 80インチ",
+			"type": "プロジェクター",
+			"location": "会議室ロッカー",
+			"createdDaysAgo": 700
+		},
+		{
+			"tag": "CM-0001",
+			"name": "ミラーレスカメラ α7 IV + 24-105mm",
+			"type": "カメラ",
+			"serial": "4291837",
+			"location": "機材庫",
+			"note": "予備バッテリー 2 個・SD カード 128GB 付き。",
+			"createdDaysAgo": 330
+		},
+		{
+			"tag": "CM-0002",
+			"name": "Vlog カメラ ZV-1 II",
+			"type": "カメラ",
+			"serial": "5512094",
+			"location": "機材庫",
+			"createdDaysAgo": 210
+		},
+		{
+			"tag": "CM-0003",
+			"name": "アクションカメラ HERO13",
+			"type": "カメラ",
+			"serial": "C3501325072218",
+			"location": "機材庫",
+			"createdDaysAgo": 150
+		},
+		{
+			"tag": "ST-0001",
+			"name": "ビデオ三脚 502",
+			"type": "撮影用品",
+			"location": "機材庫",
+			"createdDaysAgo": 330
+		},
+		{
+			"tag": "ST-0002",
+			"name": "LED ライトセット(2 灯)",
+			"type": "撮影用品",
+			"location": "機材庫",
+			"createdDaysAgo": 330
+		},
+		{
+			"tag": "ST-0003",
+			"name": "ジンバル RS 4",
+			"type": "撮影用品",
+			"serial": "6N3XK210EP",
+			"location": "機材庫",
+			"createdDaysAgo": 90
+		},
+		{
+			"tag": "AU-0001",
+			"name": "ワイヤレスマイク Mic 2(送信機 2 台)",
+			"type": "音響機材",
+			"serial": "5TYZK3B0021",
+			"location": "機材庫",
+			"createdDaysAgo": 140
+		},
+		{
+			"tag": "AU-0002",
+			"name": "会議用スピーカーフォン Speak2 75",
+			"type": "音響機材",
+			"serial": "2775-109-0331",
+			"location": "会議室ロッカー",
+			"createdDaysAgo": 260
+		},
+		{
+			"tag": "NW-0001",
+			"name": "モバイルルーター 5G",
+			"type": "ネットワーク機器",
+			"serial": "862133070041",
+			"location": "総務カウンター",
+			"note": "月 50GB まで。出張時の持ち出し用。",
+			"createdDaysAgo": 380
+		},
+		{
+			"tag": "NW-0002",
+			"name": "モバイルルーター 4G",
+			"type": "ネットワーク機器",
+			"serial": "359720084412",
+			"location": "総務カウンター",
+			"createdDaysAgo": 800
+		}
+	]
+}

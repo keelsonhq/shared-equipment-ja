@@ -1,0 +1,4 @@
+管理番号,名称,種類,製造番号,保管場所,備考
+{{PREFIX}}-01,検証用 iPhone 15(iOS 18),{{TYPE}},F2LZK81QPN,{{LOCATION}},充電ケーブル付き
+{{PREFIX}}-02,モバイルプロジェクター EF-12,{{TYPE}},,{{LOCATION}},
+{{PREFIX}}-03,小型ドローン Mini 4 Pro,{{PREFIX}} ドローン,1581F6Z9C24,{{LOCATION}},飛行許可の範囲で使うこと
